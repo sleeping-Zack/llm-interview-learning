@@ -20,6 +20,11 @@ import { LessonTwo } from '@/components/lesson-two';
 import { LessonThree } from '@/components/lesson-three';
 import { LessonFour } from '@/components/lesson-four';
 import { LessonFive } from '@/components/lesson-five';
+import { LessonSix } from '@/components/lesson-six';
+import { LessonSeven } from '@/components/lesson-seven';
+import { LessonEight } from '@/components/lesson-eight';
+import { LessonNine } from '@/components/lesson-nine';
+import { LessonTen } from '@/components/lesson-ten';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,7 +39,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
-type PageId = 'roadmap' | 'lesson-1' | 'lesson-2' | 'lesson-3' | 'lesson-4' | 'lesson-5';
+type PageId = 'roadmap' | 'lesson-1' | 'lesson-2' | 'lesson-3' | 'lesson-4' | 'lesson-5' | 'lesson-6' | 'lesson-7' | 'lesson-8' | 'lesson-9' | 'lesson-10';
 
 type Lesson = {
   id: string;
@@ -54,11 +59,11 @@ const lessons: Lesson[] = [
   { id: 'lesson-3', number: '03', title: 'Transformer 总览：Attention 取信息，FFN 做加工', shortTitle: 'Transformer 信息流', stage: '模型内部', priority: 'P0', duration: '55 分钟', description: 'Q/K/V、Mask、多头、残差、FFN、参数组成与 KV Cache。', available: true },
   { id: 'lesson-4', number: '04', title: '大模型如何学会续写：预训练与参数更新', shortTitle: '预训练与参数更新', stage: '训练基础', priority: 'P0', duration: '60 分钟', description: '交叉熵、反向传播、优化器、显存、数据工程与 Scaling Law。', available: true },
   { id: 'lesson-5', number: '05', title: '从会续写到会对话：SFT、LoRA 与偏好对齐', shortTitle: '微调与偏好对齐', stage: '能力塑造', priority: 'P0', duration: '60 分钟', description: 'SFT、低秩微调、QLoRA、RLHF、DPO 与方法边界。', available: true },
-  { id: 'lesson-6', number: '06', title: '参数到底是什么：模型容量、规模与显存', shortTitle: '参数、规模与显存', stage: '模型内部', priority: 'P0', duration: '待更新', description: '参数、超参数、激活、KV Cache、7B/72B 与显存手算。', available: false },
-  { id: 'lesson-7', number: '07', title: 'Transformer 第二遍：位置、FFN、残差与归一化', shortTitle: 'Transformer 深入', stage: '模型内部', priority: 'P0', duration: '待更新', description: '深入 Q/K/V、RoPE、SwiGLU、Residual 与 RMSNorm。', available: false },
-  { id: 'lesson-8', number: '08', title: '训练为什么这么贵：优化器、Batch 与分布式训练', shortTitle: '训练成本与并行', stage: '训练深入', priority: 'P1', duration: '待更新', description: 'AdamW、混合精度、梯度检查点与三类分布式并行。', available: false },
-  { id: 'lesson-9', number: '09', title: 'LoRA 与 QLoRA 深入：少改参数为什么有效', shortTitle: 'LoRA / QLoRA 深入', stage: '训练深入', priority: 'P0', duration: '待更新', description: '低秩假设、Rank、Target Modules、量化基座与选型。', available: false },
-  { id: 'lesson-10', number: '10', title: '模型如何学习人类偏好：RLHF 与 DPO', shortTitle: 'RLHF / DPO 深入', stage: '对齐深入', priority: 'P1', duration: '待更新', description: '奖励模型、PPO、偏好对、KL、DPO 与对齐风险。', available: false },
+  { id: 'lesson-6', number: '06', title: '参数到底是什么：模型容量、规模与显存', shortTitle: '参数、规模与显存', stage: '模型内部', priority: 'P0', duration: '75 分钟', description: '参数、超参数、激活、KV Cache、7B/72B 与显存手算。', available: true },
+  { id: 'lesson-7', number: '07', title: 'Transformer 第二遍：位置、FFN、残差与归一化', shortTitle: 'Transformer 深入', stage: '模型内部', priority: 'P0', duration: '80 分钟', description: '深入 Q/K/V、RoPE、SwiGLU、Residual 与 RMSNorm。', available: true },
+  { id: 'lesson-8', number: '08', title: '训练为什么这么贵：优化器、Batch 与分布式训练', shortTitle: '训练成本与并行', stage: '训练深入', priority: 'P1', duration: '85 分钟', description: 'AdamW、混合精度、梯度检查点、ZeRO 与三类分布式并行。', available: true },
+  { id: 'lesson-9', number: '09', title: 'LoRA 与 QLoRA 深入：少改参数为什么有效', shortTitle: 'LoRA / QLoRA 深入', stage: '训练深入', priority: 'P0', duration: '80 分钟', description: '低秩更新、Rank、Target Modules、NF4、显存与部署选型。', available: true },
+  { id: 'lesson-10', number: '10', title: '模型如何学习人类偏好：RLHF 与 DPO', shortTitle: 'RLHF / DPO 深入', stage: '对齐深入', priority: 'P1', duration: '75 分钟', description: '偏好数据、奖励模型、PPO、KL、DPO 与对齐风险。', available: true },
   { id: 'lesson-11', number: '11', title: '模型如何决定下一句话：解码与生成控制', shortTitle: '解码与生成控制', stage: '推理原理', priority: 'P0', duration: '待更新', description: 'Greedy、Temperature、Top-k、Top-p、停止条件与结构化输出。', available: false },
   { id: 'lesson-12', number: '12', title: '一次请求怎样被推理引擎处理', shortTitle: '推理引擎全过程', stage: '推理工程', priority: 'P0', duration: '待更新', description: 'Prefill、Decode、KV Cache、Paged Attention、延迟与吞吐。', available: false },
   { id: 'lesson-13', number: '13', title: '量化与模型压缩：为什么 INT4 还能工作', shortTitle: '量化与模型压缩', stage: '部署优化', priority: 'P1', duration: '待更新', description: 'FP16/INT8/INT4、PTQ/QAT、蒸馏、质量与硬件权衡。', available: false },
@@ -68,6 +73,8 @@ const lessons: Lesson[] = [
   { id: 'lesson-17', number: '17', title: '如何证明系统有效：评测、安全与可观测性', shortTitle: '评测、安全与观测', stage: '可靠性', priority: 'P0', duration: '待更新', description: '测试集、LLM Judge、Bad Case、Prompt Injection 与审计。', available: false },
   { id: 'lesson-18', number: '18', title: '综合系统设计与项目答辩', shortTitle: '系统设计与答辩', stage: '综合实战', priority: 'P0', duration: '待更新', description: '模型选型、成本延迟、可靠性权衡、项目复盘与连续追问。', available: false },
 ];
+
+const availableLessonCount = lessons.filter((lesson) => lesson.available).length;
 
 const curriculumStages = [
   { title: '第一阶段 · 建立完整心智模型', range: [1, 5], description: '先看懂文本如何进入模型、模型怎样生成、训练又如何改变参数。' },
@@ -101,6 +108,25 @@ const searchEntries = [
   { page: 'lesson-5' as PageId, type: '模型调优', title: 'LoRA 原理与参数量', text: '低秩分解、Rank、Alpha、Dropout、Target Modules、合并' },
   { page: 'lesson-5' as PageId, type: '模型调优', title: 'QLoRA 与训练显存', text: '4-bit、NF4、Double Quantization、Paged Optimizer、OOM' },
   { page: 'lesson-5' as PageId, type: '偏好对齐', title: 'RLHF 与 DPO', text: 'Reward Model、PPO、KL、Chosen、Rejected、Reference Model' },
+  { page: 'lesson-6' as PageId, anchor: 'lesson-6-anatomy', type: '模型规模', title: '参数量从哪里来', text: 'Embedding、Attention、FFN、层数、隐藏维度、词表' },
+  { page: 'lesson-6' as PageId, anchor: 'lesson-6-memory', type: '显存', title: '7B / 72B 权重显存手算', text: 'FP32、BF16、INT8、INT4、量化元数据' },
+  { page: 'lesson-6' as PageId, anchor: 'lesson-6-kv', type: '推理', title: 'KV Cache 与并发显存', text: '层数、Token、KV Heads、Head Dimension、GQA' },
+  { page: 'lesson-6' as PageId, anchor: 'lesson-6-capacity', type: '训练规律', title: 'Scaling Law 与容量边界', text: '参数、训练 Token、计算预算、欠训练、MoE' },
+  { page: 'lesson-7' as PageId, anchor: 'lesson-7-rope', type: '底层原理', title: 'RoPE 旋转位置编码', text: '二维旋转、相对位置、频率、外推、长上下文' },
+  { page: 'lesson-7' as PageId, anchor: 'lesson-7-qkv', type: '底层原理', title: 'Q/K/V 与 GQA 深入', text: '信息匹配、Value 聚合、多头、KV Heads、MQA' },
+  { page: 'lesson-7' as PageId, anchor: 'lesson-7-norm', type: '模型结构', title: 'Residual 与 RMSNorm', text: '残差流、Pre-Norm、稳定训练、SwiGLU' },
+  { page: 'lesson-8' as PageId, anchor: 'lesson-8-memory', type: '训练显存', title: 'AdamW 训练显存账本', text: '参数、梯度、主权重、m、v、激活、16 Bytes' },
+  { page: 'lesson-8' as PageId, anchor: 'lesson-8-batch', type: '训练', title: 'Micro Batch 与梯度累积', text: 'Global Batch、DP Degree、有效 Token、更新步数' },
+  { page: 'lesson-8' as PageId, anchor: 'lesson-8-zero', type: '分布式', title: 'ZeRO-1 / 2 / 3 与 FSDP', text: '优化器状态、梯度、参数分片、All-Gather、Offload' },
+  { page: 'lesson-8' as PageId, anchor: 'lesson-8-parallel', type: '分布式', title: '数据、张量与流水线并行', text: 'DP、TP、PP、通信、流水线气泡、3D Parallelism' },
+  { page: 'lesson-9' as PageId, anchor: 'lesson-9-low-rank', type: '模型调优', title: 'LoRA 低秩矩阵原理', text: 'ΔW、A、B、Rank、Alpha、参数量推导' },
+  { page: 'lesson-9' as PageId, anchor: 'lesson-9-targets', type: '模型调优', title: 'Target Modules 怎样选择', text: 'q_proj、v_proj、Attention、MLP、All Linear、GQA' },
+  { page: 'lesson-9' as PageId, anchor: 'lesson-9-qlora', type: '模型调优', title: 'QLoRA、NF4 与 Double Quantization', text: '4-bit 冻结基座、BF16 计算、Paged Optimizer' },
+  { page: 'lesson-9' as PageId, anchor: 'lesson-9-memory', type: '显存', title: 'QLoRA 训练为什么仍会 OOM', text: '激活、序列长度、Micro Batch、Adapter 状态、缓冲' },
+  { page: 'lesson-10' as PageId, anchor: 'lesson-10-rm', type: '偏好对齐', title: 'Reward Model 怎样学习偏好', text: 'Chosen、Rejected、Pairwise Loss、标量奖励、Sigmoid' },
+  { page: 'lesson-10' as PageId, anchor: 'lesson-10-ppo', type: '偏好对齐', title: 'PPO、Actor 与 Critic', text: 'Rollout、Advantage、Old Policy、Clip、在线更新' },
+  { page: 'lesson-10' as PageId, anchor: 'lesson-10-kl', type: '高频追问', title: 'Reference Model、Old Policy 与 KL', text: '长期锚点、单轮快照、策略分布、漂移约束' },
+  { page: 'lesson-10' as PageId, anchor: 'lesson-10-dpo', type: '偏好对齐', title: 'DPO Loss 深入', text: 'Reference Margin、序列 Log Probability、Beta、离线偏好' },
 ];
 
 const pageMeta: Record<PageId, { label: string; title: string; description: string; duration: string }> = {
@@ -110,6 +136,11 @@ const pageMeta: Record<PageId, { label: string; title: string; description: stri
   'lesson-3': { label: 'Lesson 03 · 底层核心', title: 'Transformer 如何让信息流动', description: 'Attention 负责取信息，FFN 负责加工；同时看懂参数组成与推理时的 KV Cache。', duration: '约 55 分钟' },
   'lesson-4': { label: 'Lesson 04 · 训练主线', title: '大模型如何学会续写', description: '从一次完整参数更新出发，理解预训练、优化器、训练显存、数据与 Scaling Law。', duration: '约 60 分钟' },
   'lesson-5': { label: 'Lesson 05 · 能力塑造', title: '从会续写到会对话', description: '分清 SFT、LoRA、QLoRA、RLHF 与 DPO 各自改变什么，以及它们做不到什么。', duration: '约 60 分钟' },
+  'lesson-6': { label: 'Lesson 06 · Stage 02', title: '参数、模型规模与显存', description: '把参数量拆到每个矩阵，手算权重、KV Cache 和训练状态，建立可靠的容量直觉。', duration: '约 75 分钟' },
+  'lesson-7': { label: 'Lesson 07 · Stage 02', title: 'Transformer 深入', description: '沿残差流看懂 RoPE、Q/K/V、多头、RMSNorm 与 SwiGLU 为什么这样设计。', duration: '约 80 分钟' },
+  'lesson-8': { label: 'Lesson 08 · Stage 02', title: '训练成本与分布式并行', description: '拆开 AdamW、Batch、激活、混合精度、ZeRO 与多卡通信的真实代价。', duration: '约 85 分钟' },
+  'lesson-9': { label: 'Lesson 09 · Stage 02', title: 'LoRA 与 QLoRA 深入', description: '从低秩矩阵推导参数量，理解 Target Modules、NF4、显存与部署边界。', duration: '约 80 分钟' },
+  'lesson-10': { label: 'Lesson 10 · Stage 02', title: 'RLHF 与 DPO 深入', description: '沿偏好数据、奖励模型、PPO、KL 到 DPO，理解对齐信号及其失败方式。', duration: '约 75 分钟' },
 };
 
 function SidebarContent({
@@ -144,7 +175,7 @@ function SidebarContent({
           <BookOpen className="size-4 opacity-70" />
         </button>
 
-        <p className="mb-2 px-3 text-[11px] font-semibold tracking-[0.14em] text-sidebar-foreground/35 uppercase">已收录课程</p>
+        <p className="mb-2 px-3 text-[11px] font-semibold tracking-[0.14em] text-sidebar-foreground/35 uppercase">第一阶段 · 建立全景</p>
         <div className="space-y-1">
           {lessons.slice(0, 5).map((lesson) => (
             <button
@@ -160,24 +191,37 @@ function SidebarContent({
           ))}
         </div>
 
-        <p className="mt-6 mb-2 px-3 text-[11px] font-semibold tracking-[0.14em] text-sidebar-foreground/35 uppercase">后续路线</p>
+        <div className="mt-5 mb-2 flex items-center justify-between px-3">
+          <p className="text-[11px] font-semibold tracking-[0.14em] text-cyan-300/65 uppercase">第二阶段 · 深入原理</p>
+          <span className="rounded-full bg-cyan-400/10 px-2 py-0.5 text-[9px] font-semibold text-cyan-300">NEW</span>
+        </div>
         <div className="space-y-1">
-          {lessons.slice(5).map((lesson) => (
-            <div key={lesson.id} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sidebar-foreground/35">
-              <span className="font-mono text-xs">{lesson.number}</span>
-              <span className="min-w-0 flex-1 truncate text-xs">{lesson.shortTitle}</span>
-              <span className="text-[10px]">待更新</span>
-            </div>
+          {lessons.slice(5, 10).map((lesson) => (
+            <button
+              key={lesson.id}
+              type="button"
+              onClick={() => onNavigate(lesson.id as PageId)}
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all ${active === lesson.id ? 'bg-[linear-gradient(100deg,var(--sidebar-primary),oklch(0.64_0.14_205))] text-sidebar-primary-foreground shadow-lg shadow-blue-950/25' : 'text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}`}
+            >
+              <span className="font-mono text-xs opacity-70">{lesson.number}</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">{lesson.shortTitle}</span>
+              {completed.has(lesson.id) ? <CheckCircle2 className="size-4 text-emerald-500" /> : <Circle className="size-3 opacity-35" />}
+            </button>
           ))}
+        </div>
+
+        <p className="mt-6 mb-2 px-3 text-[11px] font-semibold tracking-[0.14em] text-sidebar-foreground/35 uppercase">后续路线 · 11–18</p>
+        <div className="rounded-xl border border-sidebar-border bg-white/[0.025] px-3 py-3 text-xs leading-5 text-sidebar-foreground/40">
+          推理与部署 · RAG 与 Agent · 评测安全 · 系统设计
         </div>
       </nav>
 
       <div className="border-t border-sidebar-border p-4 text-sidebar-foreground">
-        <Progress value={(completed.size / lessons.length) * 100} aria-label="课程学习进度">
-          <ProgressLabel>学习进度</ProgressLabel>
-          <ProgressValue>{() => `${completed.size} / ${lessons.length}`}</ProgressValue>
+        <Progress value={(completed.size / availableLessonCount) * 100} aria-label="已上线课程学习进度">
+          <ProgressLabel>已上线课程进度</ProgressLabel>
+          <ProgressValue>{() => `${completed.size} / ${availableLessonCount}`}</ProgressValue>
         </Progress>
-        <p className="mt-2 text-xs leading-5 text-sidebar-foreground/45">进度保存在当前浏览器，可随时回来继续。</p>
+        <p className="mt-2 text-xs leading-5 text-sidebar-foreground/45">进度保存在当前浏览器；后续课程上线后会自动扩展。</p>
       </div>
     </>
   );
@@ -202,8 +246,8 @@ function Roadmap({ onNavigate }: { onNavigate: (id: PageId) => void }) {
             <div className="mt-6 flex flex-wrap gap-5">
               {[
                 ['18', '完整课程路线'],
-                ['05', '已完整上线'],
-                ['06', '交互式演示'],
+                ['10', '已完整上线'],
+                ['11', '交互式演示'],
               ].map(([value, label]) => <div key={label}><p className="font-mono text-xl font-semibold text-cyan-200">{value}</p><p className="text-[11px] text-white/45">{label}</p></div>)}
             </div>
           </div>
@@ -219,7 +263,7 @@ function Roadmap({ onNavigate }: { onNavigate: (id: PageId) => void }) {
           <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">课程路线</p>
           <div className="flex flex-wrap items-end justify-between gap-3">
             <h2 className="mt-1 font-heading text-2xl font-semibold tracking-tight">18 课建立完整大模型主线</h2>
-            <Badge variant="outline">前 5 课已补充加深</Badge>
+            <Badge variant="outline">前 10 课已完整上线</Badge>
           </div>
         </div>
         <div className="space-y-8">
@@ -227,12 +271,15 @@ function Roadmap({ onNavigate }: { onNavigate: (id: PageId) => void }) {
             const [start, end] = stage.range;
             return (
               <section key={stage.title} className="space-y-4">
-                <div className="rounded-2xl border bg-muted/45 p-4 sm:flex sm:items-center sm:justify-between sm:gap-5">
+                <div className={`rounded-2xl border p-4 sm:flex sm:items-center sm:justify-between sm:gap-5 ${start === 6 ? 'border-primary/25 bg-[linear-gradient(105deg,color-mix(in_oklch,var(--primary)_10%,var(--card)),color-mix(in_oklch,var(--accent)_16%,var(--card)))] shadow-lg shadow-primary/5' : 'bg-muted/45'}`}>
                   <div>
                     <h3 className="font-heading text-lg font-semibold text-foreground">{stage.title}</h3>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">{stage.description}</p>
                   </div>
-                  <Badge variant="secondary" className="mt-3 shrink-0 sm:mt-0">Lesson {String(start).padStart(2, '0')}–{String(end).padStart(2, '0')}</Badge>
+                  <div className="mt-3 flex shrink-0 items-center gap-2 sm:mt-0">
+                    {start === 6 ? <Badge>5 / 5 已上线</Badge> : null}
+                    <Badge variant="secondary">Lesson {String(start).padStart(2, '0')}–{String(end).padStart(2, '0')}</Badge>
+                  </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   {lessons.slice(start - 1, end).map((lesson) => (
@@ -287,12 +334,12 @@ function Roadmap({ onNavigate }: { onNavigate: (id: PageId) => void }) {
   );
 }
 
-function SearchResults({ query, onNavigate }: { query: string; onNavigate: (id: PageId) => void }) {
+function SearchResults({ query, onNavigate }: { query: string; onNavigate: (id: PageId, anchor?: string) => void }) {
   const normalized = query.trim().toLowerCase();
   const results = searchEntries.filter((entry) => `${entry.type} ${entry.title} ${entry.text}`.toLowerCase().includes(normalized));
 
   return (
-    <section className="space-y-5">
+    <section id="search-results" className="scroll-mt-24 space-y-5">
       <div>
         <p className="text-sm text-muted-foreground">搜索“{query}”</p>
         <h2 className="mt-1 font-heading text-2xl font-semibold">找到 {results.length} 个相关知识点</h2>
@@ -300,7 +347,7 @@ function SearchResults({ query, onNavigate }: { query: string; onNavigate: (id: 
       {results.length ? (
         <div className="space-y-3">
           {results.map((result) => (
-            <button key={result.title} type="button" aria-label={`打开 ${result.title}`} onClick={() => onNavigate(result.page)} className="block w-full text-left">
+            <button key={`${result.page}-${'anchor' in result ? result.anchor : 'top'}-${result.title}`} type="button" aria-label={`打开 ${result.title}`} onClick={() => onNavigate(result.page, 'anchor' in result ? result.anchor : undefined)} className="block w-full text-left">
               <Card className="transition-colors hover:border-primary/40 hover:bg-muted/40">
                 <CardContent className="flex items-start gap-4 p-5">
                   <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Search className="size-4" /></span>
@@ -334,7 +381,7 @@ function SearchResults({ query, onNavigate }: { query: string; onNavigate: (id: 
 function StudyAside({ active }: { active: PageId }) {
   const content = ({
     roadmap: {
-      goals: ['先完成前五课全景主线', '每课先讲直觉再复述机制', '沿 18 课路线螺旋式深入'],
+      goals: ['先完成前十课原理主线', '每课先讲直觉再复述机制', '沿 18 课路线螺旋式深入'],
       mapping: ['P0：应用开发岗位必须脱稿回答', 'P1：常见进阶追问，重点理解取舍'],
       tip: '建议每次只学一课，第二天不看笔记复述一次。看懂不等于会说，主动回忆才会留下来。',
     },
@@ -363,10 +410,35 @@ function StudyAside({ active }: { active: PageId }) {
       mapping: ['LoRA 可承载 SFT 或 DPO 更新', 'RAG、微调和偏好对齐解决不同问题'],
       tip: '把“训练目标”和“参数更新方式”分开，是这一课最关键的面试表达。',
     },
+    'lesson-6': {
+      goals: ['手算权重与 KV Cache 数量级', '区分参数、激活与训练状态', '解释参数规模和能力不是等号'],
+      mapping: ['模型选型先看质量门槛，再算显存与并发', '线上容量必须把 KV Cache 按请求计入'],
+      tip: '遇到显存题先声明口径：推理还是训练、什么精度、是否量化、序列和并发是多少。',
+    },
+    'lesson-7': {
+      goals: ['沿残差流画出 Decoder Block', '用旋转直觉解释 RoPE', '说清 RMSNorm 与 SwiGLU 分工'],
+      mapping: ['长上下文不是只改一个最大长度数字', 'GQA 是 KV Cache、质量与吞吐的架构取舍'],
+      tip: '讲组件时同时回答“它处理什么信息、为何这样设计、删掉会怎样”。',
+    },
+    'lesson-8': {
+      goals: ['拆出全参训练显存账本', '算清 Global Batch', '区分 DP、TP、PP 与 ZeRO'],
+      mapping: ['训练 OOM 先判断状态显存还是激活显存', '多卡方案必须结合通信拓扑与吞吐'],
+      tip: '不要把省显存和提速混为一谈；Checkpointing、Offload、ZeRO 都可能用额外计算或通信换空间。',
+    },
+    'lesson-9': {
+      goals: ['推导 LoRA 参数量', '解释 Target Modules 与 Rank', '说明 QLoRA 三种精度口径'],
+      mapping: ['行为格式适合微调，动态事实优先 RAG', '部署前验证 Adapter 与基座、模板严格匹配'],
+      tip: '回答 LoRA 时先讲 ΔW=BA，再讲省下了哪些状态，最后补上激活和前向计算仍存在。',
+    },
+    'lesson-10': {
+      goals: ['画出经典 RLHF 四个角色', '分清 Reference 与 Old Policy', '用人话解释 DPO Loss'],
+      mapping: ['偏好优化负责行为取舍，不负责实时事实', '生产安全仍需要权限、校验、审计和人工升级'],
+      tip: '所有对齐指标都要追问：它究竟测了什么？模型有没有学会利用这个代理指标？',
+    },
   } satisfies Record<PageId, { goals: string[]; mapping: string[]; tip: string }>)[active];
 
   return (
-    <aside className="space-y-4 lg:sticky lg:top-8 lg:self-start">
+    <aside className="space-y-4 2xl:sticky 2xl:top-24 2xl:self-start">
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2 text-primary"><Target className="size-4" /><CardTitle className="text-base">这一页的通过标准</CardTitle></div>
@@ -412,22 +484,37 @@ export function LearningSite() {
 
     const syncFromHash = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['roadmap', 'lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5'].includes(hash)) setActive(hash as PageId);
+      const [route, nestedAnchor] = hash.split('/');
+      const pageIds = ['roadmap', 'lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5', 'lesson-6', 'lesson-7', 'lesson-8', 'lesson-9', 'lesson-10'];
+      const sectionMatch = route.match(/^(lesson-(?:10|[1-9]))-/);
+      const nextPage = pageIds.includes(route) ? route : sectionMatch?.[1];
+      if (!nextPage) return;
+      setActive(nextPage as PageId);
+      const targetId = nestedAnchor || (sectionMatch ? route : '');
+      if (targetId) {
+        window.requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView({ block: 'start' }));
+      }
     };
     syncFromHash();
     window.addEventListener('popstate', syncFromHash);
+    window.addEventListener('hashchange', syncFromHash);
     return () => {
       if (restoreFrame !== undefined) window.cancelAnimationFrame(restoreFrame);
       window.removeEventListener('popstate', syncFromHash);
+      window.removeEventListener('hashchange', syncFromHash);
     };
   }, []);
 
-  const navigate = (id: PageId) => {
+  const navigate = (id: PageId, anchor?: string) => {
     setActive(id);
     setQuery('');
     setMobileOpen(false);
-    window.history.pushState(null, '', `#${id}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.history.pushState(null, '', anchor ? `#${id}/${anchor}` : `#${id}`);
+    if (anchor) {
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' })));
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const toggleComplete = () => {
@@ -444,7 +531,14 @@ export function LearningSite() {
   const meta = pageMeta[active];
   const isSearching = query.trim().length > 0;
   const activeCompleted = completed.has(active);
-  const searchPlaceholder = useMemo(() => '搜索 参数、RoPE、Attention、SFT、LoRA…', []);
+  const searchPlaceholder = useMemo(() => '搜索 RoPE、ZeRO、LoRA、PPO、DPO…', []);
+  const lessonNumber = active.startsWith('lesson-') ? Number(active.replace('lesson-', '')) : 1;
+  const activeStageLessons = lessonNumber >= 6 ? lessons.slice(5, 10) : lessons.slice(0, 5);
+
+  useEffect(() => {
+    if (!isSearching) return;
+    window.requestAnimationFrame(() => document.getElementById('search-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }, [isSearching]);
 
   const renderActivePage = () => {
     switch (active) {
@@ -459,13 +553,23 @@ export function LearningSite() {
       case 'lesson-4':
         return <LessonFour onPrevious={() => navigate('lesson-3')} onNext={() => navigate('lesson-5')} />;
       case 'lesson-5':
-        return <LessonFive onPrevious={() => navigate('lesson-4')} onRoadmap={() => navigate('roadmap')} />;
+        return <LessonFive onPrevious={() => navigate('lesson-4')} onNext={() => navigate('lesson-6')} />;
+      case 'lesson-6':
+        return <LessonSix onPrevious={() => navigate('lesson-5')} onNext={() => navigate('lesson-7')} />;
+      case 'lesson-7':
+        return <LessonSeven onPrevious={() => navigate('lesson-6')} onNext={() => navigate('lesson-8')} />;
+      case 'lesson-8':
+        return <LessonEight onPrevious={() => navigate('lesson-7')} onNext={() => navigate('lesson-9')} />;
+      case 'lesson-9':
+        return <LessonNine onPrevious={() => navigate('lesson-8')} onNext={() => navigate('lesson-10')} />;
+      case 'lesson-10':
+        return <LessonTen onPrevious={() => navigate('lesson-9')} onRoadmap={() => navigate('roadmap')} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b bg-background/92 backdrop-blur-xl md:hidden">
+      <header className="sticky top-0 z-40 border-b bg-background/92 backdrop-blur-xl lg:hidden">
         <div className="flex h-16 items-center justify-between gap-3 px-4">
           <button type="button" onClick={() => navigate('roadmap')} className="flex min-w-0 items-center gap-2.5 text-left">
             <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground"><BrainCircuit className="size-5" /></span>
@@ -481,21 +585,21 @@ export function LearningSite() {
         </div>
       </header>
 
-      <aside className="sidebar-mesh fixed inset-y-0 left-0 z-30 hidden w-72 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
+      <aside className="sidebar-mesh fixed inset-y-0 left-0 z-30 hidden w-72 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
         <SidebarContent active={active} completed={completed} onNavigate={navigate} />
       </aside>
 
-      <main className="md:pl-72">
-        <div className="border-b bg-background/86 backdrop-blur-xl md:sticky md:top-0 md:z-20">
+      <main className="lg:pl-72">
+        <div className="border-b bg-background/86 backdrop-blur-xl lg:sticky lg:top-0 lg:z-20">
           <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-7 lg:px-10">
             <div className="relative flex-1 sm:max-w-md">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={searchPlaceholder} aria-label="搜索课程知识点" className="h-10 pl-9" />
             </div>
-            <div className="hidden items-center gap-1.5 lg:flex" aria-label="前五课课程状态">
-              {lessons.slice(0, 5).map((lesson) => <button key={lesson.id} type="button" onClick={() => navigate(lesson.id as PageId)} aria-label={`进入 Lesson ${lesson.number}`} className={`h-1.5 rounded-full transition-all ${active === lesson.id ? 'w-7 bg-primary' : completed.has(lesson.id) ? 'w-3 bg-emerald-500' : 'w-3 bg-border hover:bg-primary/40'}`} />)}
+            <div className="hidden items-center gap-1.5 xl:flex" aria-label="当前阶段课程状态">
+              {activeStageLessons.map((lesson) => <button key={lesson.id} type="button" onClick={() => navigate(lesson.id as PageId)} aria-label={`进入 Lesson ${lesson.number}`} className={`h-1.5 rounded-full transition-all ${active === lesson.id ? 'w-7 bg-primary' : completed.has(lesson.id) ? 'w-3 bg-emerald-500' : 'w-3 bg-border hover:bg-primary/40'}`} />)}
             </div>
-            <Badge variant="outline" className="hidden sm:inline-flex">已完成 5 / 18 课内容</Badge>
+            <Badge variant="outline" className="hidden sm:inline-flex">已上线 10 / 18</Badge>
           </div>
         </div>
 
@@ -525,7 +629,7 @@ export function LearningSite() {
             </div>
           ) : null}
 
-          <div className={`grid gap-7 ${isSearching ? '' : 'lg:grid-cols-[minmax(0,1fr)_280px]'}`}>
+          <div className={`grid gap-7 ${isSearching ? '' : '2xl:grid-cols-[minmax(0,1fr)_280px]'}`}>
             <div className="min-w-0">
               {isSearching ? <SearchResults query={query} onNavigate={navigate} /> : renderActivePage()}
             </div>

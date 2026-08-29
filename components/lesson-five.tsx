@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function LessonFive({ onPrevious, onRoadmap }: { onPrevious: () => void; onRoadmap: () => void }) {
+export function LessonFive({ onPrevious, onNext }: { onPrevious: () => void; onNext: () => void }) {
   return (
     <article className="lesson-article space-y-10">
       <KeyStatement>
@@ -289,7 +289,7 @@ h = W₀x + (α / r) · B · A · x</FormulaBlock>
 
       <div className="flex flex-wrap justify-between gap-3 border-t pt-6">
         <Button variant="outline" size="lg" onClick={onPrevious}><ArrowLeft data-icon="inline-start" />返回 Lesson 04</Button>
-        <Button variant="secondary" size="lg" onClick={onRoadmap}>返回学习地图<ArrowRight data-icon="inline-end" /></Button>
+        <Button size="lg" onClick={onNext}>下一课：参数与显存<ArrowRight data-icon="inline-end" /></Button>
       </div>
     </article>
   );

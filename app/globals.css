@@ -147,6 +147,14 @@
     animation: lesson-rise 360ms ease-out both;
   }
 
+  .lesson-navigator > div:last-child {
+    scrollbar-width: none;
+  }
+
+  .lesson-navigator > div:last-child::-webkit-scrollbar {
+    display: none;
+  }
+
   .lesson-copy code:not(pre code) {
     border: 1px solid color-mix(in oklch, var(--border) 72%, var(--primary));
     border-radius: 0.38rem;
@@ -154,6 +162,13 @@
     padding: 0.1rem 0.36rem;
     color: color-mix(in oklch, var(--primary) 84%, var(--foreground));
     font-size: 0.88em;
+  }
+
+  .lesson-copy > p,
+  .lesson-copy > ul,
+  .lesson-copy > ol {
+    max-width: 48rem;
+    text-wrap: pretty;
   }
 
   .sidebar-mesh {

@@ -36,7 +36,7 @@ export function LessonSection({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 space-y-4">
+    <section id={id} className="scroll-mt-44 space-y-4">
       <div className="flex items-start gap-3">
         <span className="mt-2 h-5 w-1 rounded-full bg-gradient-to-b from-primary to-cyan-400" />
         <div>
@@ -136,7 +136,7 @@ export function DeepDive({
         </div>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-3 pt-6 md:grid-cols-3">
+      <CardContent className="grid gap-3 pt-6 lg:grid-cols-3">
         {[
           ['先用人话', intuition],
           ['再讲机制', mechanism],
