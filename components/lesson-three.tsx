@@ -4,10 +4,12 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, Cpu, Layers3, Zap } f
 
 import {
   AttentionDemo,
+  DeepDive,
   FormulaBlock,
   InterviewAnswer,
   KeyStatement,
   LessonSection,
+  ParameterAnatomyDemo,
   QuizList,
 } from '@/components/learning-widgets';
 import { Badge } from '@/components/ui/badge';
@@ -153,6 +155,33 @@ MHA(X) = Concat(head₁, ..., headₕ)W_O</FormulaBlock>
         <FormulaBlock label="现代 LLM 常见 SwiGLU">FFN(x) = [SiLU(xW_gate) ⊙ (xW_up)]W_down</FormulaBlock>
       </LessonSection>
 
+      <LessonSection id="lesson-3-parameters" eyebrow="加深 A · 模型规模" title="7B、14B 的参数到底从哪里长出来">
+        <DeepDive
+          title="把 Transformer 想成一栋重复搭建的加工大楼"
+          intuition={<>层数 <code>L</code> 像楼层数；隐藏维度 <code>d</code> 像走廊宽度；FFN 中间维度像加工车间；词表 <code>V</code> 决定入口要准备多少种 Token 名片。</>}
+          mechanism={<>每层 Attention 有 Q、K、V、O 投影，约 <code>4d²</code>；SwiGLU 常有 Gate、Up、Down 三个矩阵，约 <code>3d·d_ff</code>。所有层重复累加。</>}
+          takeaway={<>“7B”是约 70 亿个可训练数字，不是 70 亿条知识。层数增加近似线性；宽度 <code>d</code> 出现在矩阵两边，代价常接近平方增长。</>}
+        />
+        <FormulaBlock label="Dense Decoder 的粗略参数量">Parameters ≈ V·d + L·(4d² + 3d·d_ff)</FormulaBlock>
+        <ParameterAnatomyDemo />
+        <div className="grid gap-3 md:grid-cols-2">
+          <Card>
+            <CardHeader><CardTitle>FFN 参数多，Attention 长文本贵</CardTitle></CardHeader>
+            <CardContent className="text-sm leading-6 text-muted-foreground">FFN 的大矩阵常占 Block 参数大头；但标准 Attention 还要处理 T × T 的位置关系，序列极长时计算与访存会成为瓶颈。两句话可以同时成立。</CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle>Head 变多，参数不一定同比变多</CardTitle></CardHeader>
+            <CardContent className="text-sm leading-6 text-muted-foreground">若总隐藏维度 d 不变，更多 Head 常只是把同一向量切得更细，每个 Head 会变窄；Q/K/V/O 总矩阵尺寸可能基本不变。</CardContent>
+          </Card>
+        </div>
+        <DeepDive
+          title="为什么要堆很多层"
+          intuition={<>一层只完成一轮“跨 Token 开会取信息 → 各自回工位加工”。多层堆叠，让信息可以被反复组合与修正。</>}
+          mechanism={<>每个 Block 都在残差流上增加一次 Attention 与 FFN 变换。浅层到深层可能形成越来越抽象的表示，但不存在“第 10 层固定管语法”的硬规则。</>}
+          takeaway={<>Attention 不是整台 Transformer。真正的能力来自位置、Attention、FFN、残差、归一化与许多层共同协作。</>}
+        />
+      </LessonSection>
+
       <LessonSection id="lesson-3-inference" eyebrow="08 · 训练与推理" title="训练并行、生成串行，矛盾吗">
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
@@ -252,6 +281,8 @@ MHA(X) = Concat(head₁, ..., headₕ)W_O</FormulaBlock>
           { question: 'KV Cache 缓存什么，为什么不缓存旧 Q？', answer: '缓存每层历史 Token 的 K 和 V。新位置需要自己的 Q 查询历史 K 并汇总历史 V；旧 Q 已完成过去查询，通常不再使用。' },
           { question: 'MHA、MQA、GQA 的主要区别是什么？', answer: '区别在 K/V Heads 的共享程度：MHA 各自独立，MQA 全部共享一组，GQA 分组共享，是质量与缓存成本的折中。' },
           { question: '为什么把 Agent 的全部历史都塞进 Prompt 可能更差？', answer: '会提高 Prefill、KV Cache、延迟和成本，并让有效信息与噪声竞争；应把完整状态外置，只投影当前任务需要的内容。' },
+          { question: '为什么隐藏维度翻倍时，主干参数常接近四倍？', answer: 'Attention 和 FFN 的主要权重都是大矩阵，隐藏维度 d 同时出现在输入和输出两边，因此多项近似按 d² 增长。' },
+          { question: '为什么“FFN 参数更多”和“长上下文 Attention 更贵”不矛盾？', answer: '参数量与运行时计算瓶颈不是同一个指标。FFN 大矩阵常占更多参数；标准 Attention 的位置两两交互却会随序列长度约按 T² 增长。' },
         ]} />
       </LessonSection>
 

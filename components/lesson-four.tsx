@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, Database, FlaskConical, GraduationCap } from 'lucide-react';
 
 import {
+  DeepDive,
   FormulaBlock,
   InterviewAnswer,
   KeyStatement,
@@ -101,6 +102,28 @@ export function LessonFour({ onPrevious, onNext }: { onPrevious: () => void; onN
         </p>
       </LessonSection>
 
+      <LessonSection id="lesson-4-optimizer" eyebrow="加深 A · Optimizer" title="AdamW 为什么比一句“沿梯度下山”更复杂">
+        <DeepDive
+          title="梯度给方向，Optimizer 决定真正迈多大一步"
+          intuition={<>普通梯度下降只看当前坡度；Adam 像同时记一本“最近总体往哪走”和“这里平时抖得多不多”的日志，为不同参数调节步长。</>}
+          mechanism={<>Adam 为每个参数维护梯度的一阶动量 <code>m</code> 和平方梯度的二阶动量 <code>v</code>；AdamW 再把 Weight Decay 与梯度更新解耦。</>}
+          takeaway={<>Optimizer 状态也是与参数同规模的大数组，所以<strong className="text-foreground">训练显存远大于只加载权重做推理</strong>。</>}
+        />
+        <FormulaBlock label="Adam 的两本历史账">m_t = β₁m_&#123;t-1&#125; + (1-β₁)g_t
+          {'\n'}v_t = β₂v_&#123;t-1&#125; + (1-β₂)g_t²</FormulaBlock>
+        <div className="grid gap-3 sm:grid-cols-4">
+          {[
+            ['低精度权重', '约 2 B / 参数'],
+            ['梯度', '约 2 B / 参数'],
+            ['FP32 主权重', '约 4 B / 参数'],
+            ['Adam m + v', '约 8 B / 参数'],
+          ].map(([title, value]) => <div key={title} className="rounded-xl border bg-card p-4"><p className="text-xs text-muted-foreground">{title}</p><p className="mt-1 font-mono text-sm font-semibold text-foreground">{value}</p></div>)}
+        </div>
+        <p>
+          上面是常见混合精度全量训练的数量级直觉，合计可接近 <code>16 Bytes / 参数</code>，还没算激活和临时张量。具体实现会因精度、分片、量化优化器与框架而变化，不能把 16 当成永远精确的常数。
+        </p>
+      </LessonSection>
+
       <LessonSection id="lesson-4-batch" eyebrow="07 · 训练批次" title="Batch、Sequence 与一次参数更新">
         <FormulaBlock>Input shape = [Batch Size, Sequence Length]
 Global Batch ≈ Micro Batch × GPU 数 × Gradient Accumulation
@@ -116,6 +139,19 @@ Tokens per Update ≈ Global Batch × Sequence Length</FormulaBlock>
           ].map(([title, text]) => <Card key={title}><CardHeader><CardTitle className="text-base">{title}</CardTitle></CardHeader><CardContent className="text-sm leading-6 text-muted-foreground">{text}</CardContent></Card>)}
         </div>
         <p>序列越长，能容纳的上下文越多，但标准 Attention 计算增长很快。训练中常使用长度分桶、动态 Padding、Packing 与梯度检查点。</p>
+      </LessonSection>
+
+      <LessonSection id="lesson-4-precision" eyebrow="加深 B · 精度与激活" title="混合精度不是把所有数字都粗暴变成 16 位">
+        <DeepDive
+          title="小计算器负责大部分工作，关键账目保留高精度"
+          intuition={<>大矩阵乘法用更省显存、更快的 BF16/FP16；容易累积误差的归一化、累加或优化器状态则可能保留 FP32。</>}
+          mechanism={<>FP16 尾数更细但指数范围较窄，常需 Loss Scaling 防止小梯度变成 0；BF16 的指数范围接近 FP32，更耐大范围数值，但尾数并不更精细。</>}
+          takeaway={<>BF16 的优势主要是<strong className="text-foreground">数值范围更稳</strong>，不是“精度全面高于 FP16”。出现 NaN 仍要查学习率、异常数据和梯度范数。</>}
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card><CardHeader><CardTitle>激活像解题草稿</CardTitle></CardHeader><CardContent className="text-sm leading-6 text-muted-foreground">为了反向传播，每层的中间结果通常要暂存。它大致随 Micro Batch、序列长度、层数和隐藏维度增长，长序列还会引入昂贵的 Attention 中间计算。</CardContent></Card>
+          <Card><CardHeader><CardTitle>Gradient Checkpointing</CardTitle></CardHeader><CardContent className="text-sm leading-6 text-muted-foreground">前向时少留一部分“草稿”，反向时再重算。它用更多计算时间换更少激活显存，不会减少模型参数，也不会让总计算凭空消失。</CardContent></Card>
+        </div>
       </LessonSection>
 
       <LessonSection id="lesson-4-data" eyebrow="08 · 数据工程" title="数量、质量、去重和配比共同决定能力">
@@ -142,6 +178,10 @@ Tokens per Update ≈ Global Batch × Sequence Length</FormulaBlock>
         <FormulaBlock label="Scaling Law 直觉">Loss ≈ C + A / N^α + B / D^β</FormulaBlock>
         <p>
           <code>N</code> 是参数量，<code>D</code> 是训练 Token 数。Scaling Law 说明在一定范围内规模增加有可预测趋势，但重点是模型、数据和计算的配平，不是“参数越多一定越好”。
+        </p>
+        <FormulaBlock label="Dense Transformer 训练算力粗估">Training FLOPs ≈ 6 × N × D</FormulaBlock>
+        <p>
+          这是建立数量级的近似，不是云账单公式。它提醒我们：参数翻倍或训练 Token 翻倍，计算量都会大致同比增加；同样 Token 数下，重复、低质数据的有效信息仍可能很低。
         </p>
       </LessonSection>
 
@@ -235,6 +275,8 @@ Tokens per Update ≈ Global Batch × Sequence Length</FormulaBlock>
           { question: '每天更新的企业价格知识优先 SFT 还是 RAG？', answer: '优先 RAG，因为更新快、可追溯；若输出格式仍不稳定，再考虑 SFT。' },
           { question: '微调后目标任务提升，但数学和代码下降，是什么问题？', answer: '灾难性遗忘或能力退化；可减小学习率、减少 Epoch、混入通用数据、Early Stopping、LoRA，并做通用能力回归。' },
           { question: '为什么不能只根据训练 Loss 判断成功？', answer: '它只反映对训练 Token 的拟合，不能证明泛化，也排除不了过拟合、记忆或数据泄漏；需独立验证集与真实业务指标。' },
+          { question: '为什么 AdamW 全量训练的显存会远高于模型权重本身？', answer: '除低精度权重外，还要保存梯度、可能的 FP32 主权重，以及 Adam 的一阶和二阶动量；另外还有激活与临时张量。' },
+          { question: 'Gradient Checkpointing 省的是什么，代价是什么？', answer: '它主要减少需要长期保存的激活，在反向传播时重算部分前向结果，因此用额外计算时间换峰值显存。' },
         ]} />
       </LessonSection>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Binary, Eye, EyeOff, Gauge, RotateCcw, Sparkles } from 'lucide-react';
+import { Binary, BookOpenCheck, Eye, EyeOff, Gauge, RotateCcw, Sparkles } from 'lucide-react';
 
 import {
   Accordion,
@@ -111,6 +111,42 @@ export function InterviewAnswer({
         <blockquote className="text-[15px] leading-7 text-muted-foreground">
           {children}
         </blockquote>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function DeepDive({
+  title,
+  intuition,
+  mechanism,
+  takeaway,
+}: {
+  title: string;
+  intuition: React.ReactNode;
+  mechanism: React.ReactNode;
+  takeaway: React.ReactNode;
+}) {
+  return (
+    <Card className="overflow-hidden border-primary/20">
+      <CardHeader className="border-b bg-[linear-gradient(100deg,color-mix(in_oklch,var(--primary)_9%,var(--card)),var(--card))]">
+        <div className="mb-1 flex items-center gap-2 text-primary">
+          <BookOpenCheck className="size-4" />
+          <span className="text-xs font-semibold tracking-wide">深入，但不绕</span>
+        </div>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-3 pt-6 md:grid-cols-3">
+        {[
+          ['先用人话', intuition],
+          ['再讲机制', mechanism],
+          ['最后记住', takeaway],
+        ].map(([label, content]) => (
+          <div key={label as string} className="rounded-xl border bg-muted/45 p-4 text-sm leading-6 text-muted-foreground">
+            <p className="mb-2 text-xs font-semibold tracking-wide text-primary">{label}</p>
+            <div>{content}</div>
+          </div>
+        ))}
       </CardContent>
     </Card>
   );
@@ -344,7 +380,7 @@ export function ContextBudgetDemo() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           {budgetFields.map((field) => (
-            <label key={field.key} className="space-y-2 text-sm text-foreground">
+            <div key={field.key} className="space-y-2 text-sm text-foreground">
               <span className="flex items-center justify-between gap-3">
                 <span className="flex min-w-0 items-center gap-2">
                   <span className={`size-2.5 shrink-0 rounded-sm ${field.color}`} />
@@ -359,12 +395,13 @@ export function ContextBudgetDemo() {
                 max={field.max}
                 step={field.step}
                 value={[values[field.key]]}
-                onValueChange={(next) =>
-                  setValues((current) => ({ ...current, [field.key]: next[0] ?? 0 }))
-                }
+                onValueChange={(next) => {
+                  const nextValue = typeof next === 'number' ? next : (next[0] ?? 0);
+                  setValues((current) => ({ ...current, [field.key]: nextValue }));
+                }}
                 aria-label={field.label}
               />
-            </label>
+            </div>
           ))}
         </div>
       </CardContent>
@@ -393,14 +430,15 @@ export function AttentionDemo() {
         <CardDescription>选择一个 Query Token，观察它从同一句话的哪些位置聚合信息。</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="选择查询 Token">
+        <fieldset className="flex flex-wrap gap-2">
+          <legend className="sr-only">选择查询 Token</legend>
           {attentionExample.map((item, index) => (
             <Button key={item.token} variant={query === index ? 'default' : 'outline'} onClick={() => setQuery(index)}>
               {item.token}
               {query === index ? <span className="ml-1 text-[10px] opacity-70">Query</span> : null}
             </Button>
           ))}
-        </div>
+        </fieldset>
 
         <div className="space-y-3">
           {attentionExample.map((item, index) => {
@@ -520,10 +558,73 @@ export function LoraParameterDemo() {
           <div className="rounded-xl bg-cyan-500/8 p-4"><p className="text-xs text-muted-foreground">占原矩阵比例</p><p className="mt-1 font-mono text-lg font-semibold text-cyan-700 dark:text-cyan-300">{ratio.toFixed(3)}%</p></div>
         </div>
 
-        <FormulaBlock>W' = W + (α / r) · B · A
+        <FormulaBlock>W′ = W + (α / r) · B · A
 A ∈ R^(r × d),  B ∈ R^(d × r)</FormulaBlock>
         <p className="text-xs leading-5 text-muted-foreground">
           这是单个方阵的示意。真实训练会选择多个层与多个 Target Modules，实际总参数量要对所有目标矩阵求和。
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function ParameterAnatomyDemo() {
+  const [dimension, setDimension] = useState(4096);
+  const [layers, setLayers] = useState(32);
+  const vocabulary = 100_000;
+  const dFfn = Math.round(((8 * dimension) / 3) / 256) * 256;
+  const embedding = vocabulary * dimension;
+  const attention = layers * 4 * dimension * dimension;
+  const ffn = layers * 3 * dimension * dFfn;
+  const total = embedding + attention + ffn;
+  const parts = [
+    { label: 'Token Embedding', value: embedding, color: 'bg-chart-2' },
+    { label: 'Attention 投影', value: attention, color: 'bg-chart-1' },
+    { label: 'FFN / SwiGLU', value: ffn, color: 'bg-chart-4' },
+  ];
+  const compact = new Intl.NumberFormat('zh-CN', { notation: 'compact', maximumFractionDigits: 2 });
+
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b bg-muted/45">
+        <div className="flex items-center gap-2 text-primary"><Gauge className="size-4" /><CardTitle>模型参数从哪里长出来</CardTitle></div>
+        <CardDescription>用一个简化的 Dense Decoder 估算，观察“宽度”和“层数”怎样放大参数量。</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6 pt-6">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="space-y-1.5 text-sm font-medium text-foreground">
+            <span className="block">隐藏维度 d</span>
+            <NativeSelect value={String(dimension)} onChange={(event) => setDimension(Number(event.target.value))}>
+              {[2048, 4096, 5120, 8192].map((value) => <NativeSelectOption key={value} value={value}>{value.toLocaleString('zh-CN')}</NativeSelectOption>)}
+            </NativeSelect>
+          </label>
+          <label className="space-y-1.5 text-sm font-medium text-foreground">
+            <span className="block">Transformer 层数 L</span>
+            <NativeSelect value={String(layers)} onChange={(event) => setLayers(Number(event.target.value))}>
+              {[16, 24, 32, 48, 80].map((value) => <NativeSelectOption key={value} value={value}>{value} 层</NativeSelectOption>)}
+            </NativeSelect>
+          </label>
+        </div>
+
+        <div className="flex h-4 overflow-hidden rounded-full bg-muted" aria-label="参数组成比例">
+          {parts.map((part) => <div key={part.label} className={`${part.color} h-full transition-[width] duration-300`} style={{ width: `${(part.value / total) * 100}%` }} />)}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {parts.map((part) => (
+            <div key={part.label} className="rounded-xl border bg-card p-4">
+              <span className="flex items-center gap-2 text-xs text-muted-foreground"><span className={`size-2.5 rounded-sm ${part.color}`} />{part.label}</span>
+              <p className="mt-2 font-mono text-lg font-semibold text-foreground">{compact.format(part.value)}</p>
+              <p className="text-xs text-muted-foreground">约 {((part.value / total) * 100).toFixed(1)}%</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-xl bg-primary/7 p-4 text-sm leading-6 text-muted-foreground">
+          在这组简化假设下，总参数约 <strong className="font-mono text-foreground">{compact.format(total)}</strong>。维度 d 出现在矩阵的两边，所以宽度翻倍，很多主干参数接近变成 4 倍；层数翻倍则大致线性翻倍。
+        </div>
+        <p className="text-xs leading-5 text-muted-foreground">
+          估算假设：词表 100k、MHA 的 Q/K/V/O、SwiGLU、输入输出 Embedding 共享权重；省略 Norm、Bias，并未计入 GQA/MoE 等架构差异。它用于建立量级直觉，不用于还原某个具体模型。
         </p>
       </CardContent>
     </Card>

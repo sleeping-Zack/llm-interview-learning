@@ -3,6 +3,7 @@
 import { ArrowRight, CheckCircle2, CircleAlert, Lightbulb } from 'lucide-react';
 
 import {
+  DeepDive,
   FormulaBlock,
   InterviewAnswer,
   KeyStatement,
@@ -46,6 +47,18 @@ export function LessonOne({ onNext }: { onNext: () => void }) {
             </div>
           ))}
         </div>
+      </LessonSection>
+
+      <LessonSection id="lesson-1-emergence" eyebrow="加深 A · 目标与能力" title="只做“文字接龙”，为什么还能写代码和推理">
+        <DeepDive
+          title="训练目标简单，不代表内部计算简单"
+          intuition={<>如果让一个人做海量“补全后半句”，为了补准技术文档、小说和代码，他迟早要学会语法、概念关系、指代和常见推理模式。</>}
+          mechanism={<>模型始终优化 <code>P(x_t | x_&#123;&lt;t&#125;)</code>。但要让不同场景里的真实后续获得高概率，它必须在隐藏状态中形成能复用的内部表示和计算方式。</>}
+          takeaway={<>“下一个 Token”描述的是<strong className="text-foreground">训练目标</strong>，不是对模型能力上限的评价；能形成推理模式，也不保证每次都推对。</>}
+        />
+        <p>
+          一步预测是局部任务，连续很多步就能组成解释、翻译或程序。就像 CPU 的单条指令很简单，许多指令组合后却能运行复杂软件。这里不需要把模型神化，也不能把它贬成只会背固定句子的输入法。
+        </p>
       </LessonSection>
 
       <LessonSection id="lesson-1-intuition" eyebrow="02 · 超级输入法" title="先用一个准确的类比理解">
@@ -133,6 +146,39 @@ export function LessonOne({ onNext }: { onNext: () => void }) {
         <p>
           <strong className="text-foreground">Causal Mask（因果掩码）</strong>保证每个位置训练时只能看见自己之前的 Token，不能偷看后面的标准答案。这样训练任务才与实际生成一致。
         </p>
+      </LessonSection>
+
+      <LessonSection id="lesson-1-parameters" eyebrow="加深 B · 知识在哪里" title="参数不是数据库：模型到底把什么学进去了">
+        <DeepDive
+          title="几十亿参数，是几十亿个调节旋钮，不是几十亿条事实"
+          intuition={<>参数更像被压缩进大量旋钮的“世界规律”。提问时模型不是定位某个知识单元格，而是让输入经过层层变换，使某些后续 Token 得分更高。</>}
+          mechanism={<>训练会更新权重 <code>W</code>；普通推理中 <code>W</code> 固定，变化的是本次请求的隐藏状态与 KV Cache。知识通常分散在许多参数及其组合中。</>}
+          takeaway={<>参数量代表可学习的<strong className="text-foreground">容量</strong>，不等于可准确查询的事实条数，更不保证信息最新、可溯源。</>}
+        />
+        <FormulaBlock label="一层的抽象写法">h⁽ˡ⁺¹⁾ = f(h⁽ˡ⁾; W⁽ˡ⁾)</FormulaBlock>
+        <div className="grid gap-3 md:grid-cols-3">
+          {[
+            ['模型参数', '训练形成的长期能力与倾向', '预训练、SFT、LoRA 等训练才会更新'],
+            ['当前上下文', '这次请求的临时工作台', 'Prompt、Few-shot、RAG 资料会改变本次计算'],
+            ['外部系统', '可更新、可检索、可追溯的信息源', '数据库、搜索、工具结果不属于模型权重'],
+          ].map(([title, role, changes]) => (
+            <Card key={title}><CardHeader><CardTitle className="text-base">{title}</CardTitle></CardHeader><CardContent className="space-y-2 text-sm leading-6 text-muted-foreground"><p>{role}</p><p className="text-foreground">{changes}</p></CardContent></Card>
+          ))}
+        </div>
+      </LessonSection>
+
+      <LessonSection id="lesson-1-ppl" eyebrow="加深 C · 训练指标" title="Cross Entropy 与 Perplexity 到底在衡量什么">
+        <p>
+          如果真实下一个 Token 是“巴黎”，模型只给它 1% 概率，惩罚会远大于给它 90% 概率。对所有有效位置取平均，就得到语言模型常见的 Cross Entropy。
+        </p>
+        <FormulaBlock label="平均交叉熵">L = -(1/N) Σ_t log P(x_t | x_&#123;&lt;t&#125;)</FormulaBlock>
+        <FormulaBlock label="困惑度">PPL = exp(L)</FormulaBlock>
+        <DeepDive
+          title="PPL 越低，模型就一定越好吗"
+          intuition={<>PPL 可以粗略理解为模型每一步“有多犹豫”。PPL=10 像是在约 10 个同等候选中犹豫，但这只是帮助理解的近似。</>}
+          mechanism={<>PPL 是平均交叉熵的指数形式，主要衡量对这类文本的下一 Token 预测能力。Tokenizer 会改变序列切分，因此也会改变数值。</>}
+          takeaway={<>只能在<strong className="text-foreground">相同 Tokenizer、相同数据与相同计算口径</strong>下认真比较；低 PPL 不自动等于事实更准、指令跟随更好。</>}
+        />
       </LessonSection>
 
       <LessonSection id="lesson-1-alignment" eyebrow="07 · 能力形成" title="预训练、SFT 与偏好对齐">
@@ -229,6 +275,8 @@ export function LessonOne({ onNext }: { onNext: () => void }) {
             { question: '为什么训练可以并行，而生成通常串行？', answer: '训练时已有完整标准文本，可在因果掩码下同时计算各位置损失；生成时下一个位置依赖上一位置实际采样出的结果。' },
             { question: '普通对话和训练最核心的区别是什么？', answer: '普通推理通常固定模型参数，只改变本次上下文；训练会根据损失反向传播并更新参数。' },
             { question: '为什么流畅回答仍可能是幻觉？', answer: '模型优化的是高概率的合理续写，不是事实核验；上下文不足、知识过时或先前生成错误都可能导致幻觉。' },
+            { question: '模型参数、当前上下文和外部数据库的核心区别是什么？', answer: '参数是训练形成的长期权重；上下文是本次请求的临时条件，不会自动改权重；外部数据库可更新、可查询并可提供来源。' },
+            { question: '为什么两个模型的 PPL 不能直接随意比较？', answer: 'PPL 受评测数据、Tokenizer 和计算口径影响；它主要衡量下一 Token 预测，不直接等于事实性、指令跟随或综合体验。' },
           ]}
         />
       </LessonSection>

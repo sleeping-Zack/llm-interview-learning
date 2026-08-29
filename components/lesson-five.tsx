@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, Cpu, Database, SlidersHorizontal, Sparkles } from 'lucide-react';
 
 import {
+  DeepDive,
   FormulaBlock,
   InterviewAnswer,
   KeyStatement,
@@ -18,7 +19,7 @@ export function LessonFive({ onPrevious, onRoadmap }: { onPrevious: () => void; 
   return (
     <article className="lesson-article space-y-10">
       <KeyStatement>
-        Prompt 与 RAG 改变“这次看到了什么”；SFT/LoRA 改变“习惯怎样回答”；RLHF/DPO 改变“多个可行回答中更偏好哪一个”。
+        Prompt 与 RAG 决定“这次看到什么”；SFT、DPO 决定“用什么信号教”；全量、LoRA、QLoRA 决定“怎样更新参数”。先分清维度，才不会把调优名词混成一团。
       </KeyStatement>
 
       <LessonSection id="lesson-5-goals" eyebrow="01 · 学习目标" title="先把训练目标和训练方式分开">
@@ -31,6 +32,29 @@ export function LessonFive({ onPrevious, onRoadmap }: { onPrevious: () => void; 
           ].map((goal) => <div key={goal} className="flex gap-3 rounded-xl border bg-card p-4 text-foreground"><CheckCircle2 className="mt-1 size-4 shrink-0 text-primary" />{goal}</div>)}
         </div>
         <Card className="border-primary/20 bg-primary/5"><CardContent className="pt-6 text-sm leading-6 text-foreground"><strong>SFT / DPO</strong> 描述用什么数据与 Loss 训练；<strong>LoRA</strong> 描述只更新哪些参数、怎样低成本更新。两者不是同一层概念，完全可以组合。</CardContent></Card>
+      </LessonSection>
+
+      <LessonSection id="lesson-5-coordinates" eyebrow="加深 A · 三个坐标轴" title="同一个训练可以同时叫 SFT 和 LoRA，为什么">
+        <div className="overflow-hidden rounded-xl border bg-card">
+          {[
+            ['推理时输入', 'Prompt、Few-shot、RAG、Tool', '这一次让模型看到什么、能调用什么；通常不改权重。'],
+            ['训练目标', 'SFT、DPO、PPO', '用什么数据和 Loss 告诉模型“什么回答更好”。'],
+            ['参数更新方式', '全量微调、LoRA、QLoRA', '更新哪些参数，冻结基座怎样保存，如何降低训练成本。'],
+          ].map(([dimension, methods, meaning], index) => (
+            <div key={dimension} className={`grid gap-2 p-4 md:grid-cols-[42px_140px_220px_1fr] md:items-center ${index ? 'border-t' : ''}`}>
+              <span className="grid size-8 place-items-center rounded-lg bg-primary/10 font-mono text-xs text-primary">{index + 1}</span>
+              <strong className="text-foreground">{dimension}</strong>
+              <code className="font-mono text-xs text-primary">{methods}</code>
+              <span>{meaning}</span>
+            </div>
+          ))}
+        </div>
+        <DeepDive
+          title="“用 LoRA 做 SFT”到底是什么意思"
+          intuition={<>SFT 像老师拿示范答案教学；LoRA 像规定学生只能在一小组可擦写批注上记改动。一个描述教学材料，一个描述怎么记。</>}
+          mechanism={<>仍使用 SFT 的 Cross Entropy，但反向传播后只让 LoRA 的 A、B 矩阵更新。DPO 也可以用同样的 LoRA 参数更新方式训练。</>}
+          takeaway={<>SFT / DPO 回答“<strong className="text-foreground">为什么更新</strong>”，LoRA / QLoRA 回答“<strong className="text-foreground">更新谁、怎样省</strong>”。</>}
+        />
       </LessonSection>
 
       <LessonSection id="lesson-5-map" eyebrow="02 · 方法地图" title="四类手段分别解决什么问题">
@@ -63,7 +87,7 @@ export function LessonFive({ onPrevious, onRoadmap }: { onPrevious: () => void; 
 
       <LessonSection id="lesson-5-lora" eyebrow="04 · LoRA 原理" title="把完整更新限制在一个低秩子空间">
         <p>全量微调直接学习与原矩阵同大小的 <code>ΔW</code>；LoRA 假设任务更新可以用两个小矩阵近似：</p>
-        <FormulaBlock>W' = W₀ + ΔW
+        <FormulaBlock>W′ = W₀ + ΔW
 ΔW = B · A
 h = W₀x + (α / r) · B · A · x</FormulaBlock>
         <p>
@@ -73,6 +97,15 @@ h = W₀x + (α / r) · B · A · x</FormulaBlock>
         <p>
           为什么可能有效？预训练模型已有通用能力，垂直任务往往只需沿少数方向调整格式、语言风格、决策边界或工具调用习惯。但低秩是容量假设，不是所有任务都严格成立。
         </p>
+      </LessonSection>
+
+      <LessonSection id="lesson-5-lora-boundary" eyebrow="加深 B · LoRA 边界" title="Adapter 很小，不代表它能替代基座或知识库">
+        <DeepDive
+          title="LoRA 像给原教材叠加一组可学习批注"
+          intuition={<>批注可以改变解题格式、领域表达、工具调用习惯和稳定任务边界，但原教材仍然必须在场。</>}
+          mechanism={<>Adapter 只保存权重增量 <code>ΔW=BA</code>。推理时仍需精确匹配的基座、Tokenizer、Chat Template 与目标模块；Rank 只是更新空间容量，不是“能记多少条知识”。</>}
+          takeaway={<>LoRA 擅长稳定行为模式，不保证动态事实最新、可引用，也不保证加载后完全不影响通用能力。</>}
+        />
       </LessonSection>
 
       <LessonSection id="lesson-5-hyperparams" eyebrow="05 · LoRA 超参数" title="rank、alpha、dropout 与 target modules">
@@ -109,6 +142,12 @@ h = W₀x + (α / r) · B · A · x</FormulaBlock>
           ].map(([title, text]) => <Card key={title}><CardHeader><CardTitle className="font-mono text-base">{title}</CardTitle></CardHeader><CardContent className="text-sm leading-6 text-muted-foreground">{text}</CardContent></Card>)}
         </div>
         <Card className="border-amber-500/25 bg-amber-500/8"><CardContent className="pt-6 text-sm leading-6 text-foreground"><strong>“4-bit 训练”并不表示所有内容都是 4-bit：</strong>Adapter、梯度、优化器、激活、临时计算与 KV Cache 通常仍使用更高精度。</CardContent></Card>
+        <DeepDive
+          title="量化压薄了教材，却没有拿走解题草稿"
+          intuition={<>冻结基座权重像一本最厚的教材，4-bit 把它压薄；激活像每层解题留下的草稿，序列越长、Batch 越大，草稿照样会堆满桌面。</>}
+          mechanism={<>QLoRA 主要降低基座权重存储；LoRA 参数、梯度、优化器状态与大量计算仍使用更高精度，激活还随 Batch、序列、层数和隐藏维度增长。</>}
+          takeaway={<>所以 QLoRA 后 OOM，第一反应常是降 Micro Batch、缩短序列或开 Checkpointing，而不是只把 Rank 从 16 改成 8。</>}
+        />
       </LessonSection>
 
       <LessonSection id="lesson-5-memory" eyebrow="08 · 显存追问" title="QLoRA 为什么仍然可能 OOM">
@@ -157,6 +196,24 @@ h = W₀x + (α / r) · B · A · x</FormulaBlock>
         <p>
           严谨地说，DPO 不需要<strong className="text-foreground">经典 PPO-based RLHF</strong> 的显式奖励模型和 PPO；若把 RLHF 广义理解为“利用人类反馈对齐”，DPO 也属于偏好对齐方法。
         </p>
+      </LessonSection>
+
+      <LessonSection id="lesson-5-alignment-boundary" eyebrow="加深 C · 对齐边界" title="偏好对齐不是给模型安装“真理模块”">
+        <DeepDive
+          title="它更像表达教练，而不是事实核验员"
+          intuition={<>标注者在多个回答中选择更有帮助、更安全或更合适的一个，模型学习“人通常更喜欢哪种回答方式”。但人也可能偏好更长、更自信的错误答案。</>}
+          mechanism={<>RLHF / DPO 重新调整回答的概率。DPO 的 chosen 只是偏好对中更受欢迎的一方，不天然等于客观真相；参考模型用来限制行为漂移。</>}
+          takeaway={<>对齐可能让模型更愿意承认不确定，却不能凭空创造证据。事实可靠性仍要靠 RAG、工具、引用、Verifier 和独立评测。</>}
+        />
+        <p>一整段回答的概率来自每个 Token 条件概率的乘积。为避免数值下溢，实际比较通常在对数空间里把每步相加：</p>
+        <FormulaBlock label="序列对数概率">log π(y|x) = Σ_t log P(y_t | x, y_&#123;&lt;t&#125;)</FormulaBlock>
+        <div className="grid gap-3 md:grid-cols-3">
+          {[
+            ['Reward Hacking', '模型找到拿高奖励的捷径，却没有真正满足人的意图。'],
+            ['Alignment Tax', '对齐后安全或风格变好，但某些原始能力、创造性或回答意愿下降。'],
+            ['偏好捷径', '长度、措辞或固定模板成为标签线索，模型没学到真正质量差异。'],
+          ].map(([title, text]) => <Card key={title}><CardHeader><CardTitle className="text-base">{title}</CardTitle></CardHeader><CardContent className="text-sm leading-6 text-muted-foreground">{text}</CardContent></Card>)}
+        </div>
       </LessonSection>
 
       <LessonSection id="lesson-5-data-eval" eyebrow="11 · 数据与评测" title="数据质量通常比盲目增大 rank 更重要">
@@ -218,12 +275,14 @@ h = W₀x + (α / r) · B · A · x</FormulaBlock>
           { question: '用一句话解释 DPO 以及参考模型为什么重要。', answer: 'DPO 让 chosen 相对参考模型的概率提升大于 rejected；参考模型是行为锚点，防止策略为拟合偏好对而无约束漂移。' },
           { question: '每天更新且必须引用原文的内部政策，应优先 LoRA 还是 RAG？', answer: '优先 RAG，因为知识更新快且要求来源；若回答结构仍不稳定，可再结合 LoRA/SFT。' },
           { question: 'SFT、LoRA 和 DPO 能否组合？', answer: '可以。可先用 LoRA 承载 SFT，再在指令模型上用 LoRA 承载 DPO；SFT/DPO 是训练目标，LoRA 是参数更新方式。' },
+          { question: '为什么 DPO 的 chosen 不能直接叫“真实答案”？', answer: 'Chosen 只表示标注者在两个候选中更偏好它，仍可能含事实错误、偏见或长度与措辞捷径；必须单独做事实与安全评测。' },
+          { question: '对齐为什么不能替代 RAG 和外部验证？', answer: '对齐主要重排回答偏好，可能改善承认不确定等行为，但不会凭空提供最新、可追溯证据，也不能保证每个事实正确。' },
         ]} />
       </LessonSection>
 
       <Card className="overflow-hidden bg-[linear-gradient(135deg,oklch(0.22_0.08_263),oklch(0.44_0.18_266))] text-white ring-0">
         <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div><p className="text-sm text-white/65">下一课预告</p><p className="mt-1 font-heading text-xl font-semibold">推理加速、量化与部署</p><p className="mt-1 text-sm text-white/70">KV Cache、Continuous Batching、量化、吞吐、延迟与服务成本。</p></div>
+          <div><p className="text-sm text-white/65">下一课预告</p><p className="mt-1 font-heading text-xl font-semibold">参数、模型规模与显存</p><p className="mt-1 text-sm text-white/70">7B / 72B 代表什么？参数、激活、KV Cache 与模型容量到底有什么区别。</p></div>
           <Badge variant="secondary">内容整理中</Badge>
         </CardContent>
       </Card>

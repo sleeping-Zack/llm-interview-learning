@@ -2,19 +2,19 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'LLM 面试知识库｜AI 应用开发复习站',
+  title: '大模型通俗深度学习站｜从原理到 AI 应用',
   description:
-    '面向 AI 应用开发与 Agent 后端岗位的大模型学习笔记、面试回答与项目追问地图。',
+    '用通俗直觉讲清大模型底层原理、训练、推理、调优、RAG 与 Agent，并配套面试回答与闭卷自测。',
   openGraph: {
-    title: 'LLM 面试知识库',
-    description: 'AI 应用开发 · 从原理到面试',
+    title: '大模型通俗深度学习站',
+    description: '先理解原理，再走向 AI 应用与面试',
     type: 'website',
     locale: 'zh_CN',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LLM 面试知识库',
-    description: 'AI 应用开发 · 从原理到面试',
+    title: '大模型通俗深度学习站',
+    description: '先理解原理，再走向 AI 应用与面试',
   },
 };
 

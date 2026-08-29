@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, Layers3, Search } fro
 
 import {
   ContextBudgetDemo,
+  DeepDive,
   FormulaBlock,
   InterviewAnswer,
   KeyStatement,
@@ -149,6 +150,17 @@ x = EmbeddingMatrix[105]</FormulaBlock>
         </p>
       </LessonSection>
 
+      <LessonSection id="lesson-2-vector-space" eyebrow="加深 A · 向量空间" title="Embedding 不是知识表，而是一张关系地图">
+        <DeepDive
+          title="为什么高维向量可以表达语义"
+          intuition={<>把它想成城市地图：餐馆和商场可能较近，机场与住宅区可能较远。单独一个坐标轴没有完整意义，位置、方向与相对关系才有价值。</>}
+          mechanism={<>向量空间由训练目标塑造。一个 Token 的初始向量只是“基础名片”；经过多层 Attention 与 FFN 后，隐藏状态才会写入当前句子的上下文信息。</>}
+          takeaway={<>通常不能说“第 127 维就是金融”。向量相似只表示训练目标下的关系接近，<strong className="text-foreground">不保证事实相同</strong>。</>}
+        />
+        <FormulaBlock label="从静态名片到上下文化表示">h_t⁽⁰⁾ = E[id_t]
+          {'\n'}h_t⁽ˡ⁺¹⁾ = TransformerBlock_l(h_1⁽ˡ⁾, …, h_n⁽ˡ⁾)</FormulaBlock>
+      </LessonSection>
+
       <LessonSection id="lesson-2-similarity" eyebrow="06 · RAG 联系" title="Sentence Embedding 为什么能检索">
         <p>
           专门训练的 Embedding 模型会把语义相近的句子映射到向量空间中较近的位置。检索时常用余弦相似度比较方向：
@@ -165,6 +177,20 @@ x = EmbeddingMatrix[105]</FormulaBlock>
             </p>
           </CardContent>
         </Card>
+      </LessonSection>
+
+      <LessonSection id="lesson-2-lm-head" eyebrow="加深 B · 输入与输出" title="模型如何从向量重新选回一个 Token">
+        <p>
+          输入端是用 Token ID 查表得到向量；输出端不是把这一步“倒放”，而是把最后的隐藏状态投影成词表中每个 Token 的 Logit，再经过 Softmax 与解码选出结果。
+        </p>
+        <FormulaBlock label="输入查表">x_t = E[id_t]</FormulaBlock>
+        <FormulaBlock label="输出投影">z_t = h_t W_out + b</FormulaBlock>
+        <DeepDive
+          title="Weight Tying：为什么输入和输出可以共享一张表"
+          intuition={<>输入像从词典取出一张 Token 名片，输出像拿当前理解去和所有名片做匹配。两边使用同一套名片，既省参数，也让表示空间更一致。</>}
+          mechanism={<>一些模型令 <code>W_out = Eᵀ</code>，称为权重共享；也有模型不共享。无论是否共享，隐藏状态都已经经过上下文化计算，不等同于初始 Embedding。</>}
+          takeaway={<>LM Head 输出的是整个词表的分数。<strong className="text-foreground">Logit 不是 Token ID，也不是概率</strong>，仍需 Softmax 和解码。</>}
+        />
       </LessonSection>
 
       <LessonSection id="lesson-2-position" eyebrow="07 · 位置与模板" title="顺序、角色和边界如何进入模型">
@@ -195,6 +221,14 @@ x = EmbeddingMatrix[105]</FormulaBlock>
             </CardContent>
           </Card>
         </div>
+        <DeepDive
+          title="RoPE：把位置变成 Q、K 的旋转角度"
+          intuition={<>把每个位置想成钟表上不同角度的指针。同一内容出现在不同位置会旋转到不同角度；比较两根指针时，角度差就带出了相对距离。</>}
+          mechanism={<>位置 <code>m、n</code> 的向量分别变成 <code>R_m q_m</code> 与 <code>R_n k_n</code>，点积会依赖 <code>n-m</code>。不同维度对用不同转速同时表达近距与远距。</>}
+          takeaway={<>Causal Mask 只规定“不能看未来”，RoPE 才提供更细的位置线索。改大配置上限并不等于模型自动学会可靠使用更长距离。</>}
+        />
+        <FormulaBlock label="RoPE 的核心关系">q′_m = R_m q_m,  k′_n = R_n k_n
+          {'\n'}(q′_m)ᵀk′_n = q_mᵀ R_&#123;n-m&#125; k_n</FormulaBlock>
       </LessonSection>
 
       <LessonSection id="lesson-2-context" eyebrow="08 · Context Window" title="上下文窗口统计的不只是用户问题">
@@ -206,6 +240,18 @@ x = EmbeddingMatrix[105]</FormulaBlock>
         <ContextBudgetDemo />
         <p>
           工具在外部真正执行搜索或数据库查询，本身不消耗模型 Context；但工具 Schema 要先提供给模型，调用参数与结果也要重新进入上下文，因此都会消耗 Token。
+        </p>
+      </LessonSection>
+
+      <LessonSection id="lesson-2-icl" eyebrow="加深 C · 临时学习" title="没有训练，模型为什么看几个例子就会做">
+        <DeepDive
+          title="In-context Learning：在工作台上临时归纳规则"
+          intuition={<>像考试前拿到一张答题说明和两道示例。你能照着格式做第三题，但说明收走后，这不等于你接受了一次永久培训。</>}
+          mechanism={<>模型计算 <code>P(答案 | 指令、示例、资料、问题)</code>。这里只有前向计算，没有反向传播；任务规律临时存在于上下文和隐藏状态中。</>}
+          takeaway={<>Zero-shot 只给指令，Few-shot 再给少量示例。它们<strong className="text-foreground">不会更新权重</strong>，新请求若不再传入，效果通常不会自动保留。</>}
+        />
+        <p>
+          示例并非越多越好。错误示例、顺序偏差与无关信息会占用窗口并干扰判断。Prompt、RAG、工具结果和 Agent 记忆的共同本质，都是在组织模型这一次能看到的条件。
         </p>
       </LessonSection>
 
@@ -310,6 +356,9 @@ B_used + B_reserved ≤ B_run</FormulaBlock>
             { question: '模型支持 128k，业务限制 32k；系统与工具 4k、历史与 RAG 21k、问题 2k、输出预留 6k，是否超限？', answer: '总量 33k，超过 32k 的业务预算，但没有超过 128k 的模型技术窗口。' },
             { question: '工具在外部执行是否消耗 Context？工具为什么仍与 Token 预算有关？', answer: '外部执行动作本身不占 Context；但工具 Schema、调用参数和返回结果会进入模型上下文，因此消耗 Token。' },
             { question: '为什么不能从任意 Token 位置硬截断对话？', answer: '可能破坏角色边界、工具调用与结果配对、JSON、代码或关键语义。应按完整结构和信息优先级截断。' },
+            { question: 'Token Embedding、Hidden State 和 Sentence Embedding 有什么区别？', answer: 'Token Embedding 是 ID 的初始查表向量；Hidden State 是结合上下文后的逐位置表示；Sentence Embedding 是为检索等任务压缩整段文本的向量。' },
+            { question: 'RoPE 与 Causal Mask 分别解决什么问题？', answer: 'RoPE 把位置和相对距离融入 Q/K 匹配；Causal Mask 规定当前位置不能读取未来 Token，两者职责不同。' },
+            { question: 'Few-shot 为什么不是微调？', answer: 'Few-shot 只把示例放进本次上下文，通过前向计算临时归纳任务，没有反向传播，也不更新模型参数。' },
           ]}
         />
       </LessonSection>
