@@ -26,7 +26,7 @@ const terms = [
 
 export function LessonOne({ onNext }: { onNext: () => void }) {
   return (
-    <article className="space-y-10">
+    <article className="lesson-article space-y-10">
       <KeyStatement>
         LLM 是一个参数化的概率模型：它根据当前可见上下文预测下一个 Token，把结果追加回上下文，再重复这个过程。
       </KeyStatement>

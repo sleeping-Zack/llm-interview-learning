@@ -22,9 +22,9 @@ const pipeline = [
   ['Transformer', '加入位置与上下文，形成 Hidden State'],
 ];
 
-export function LessonTwo({ onPrevious, onRoadmap }: { onPrevious: () => void; onRoadmap: () => void }) {
+export function LessonTwo({ onPrevious, onNext }: { onPrevious: () => void; onNext: () => void }) {
   return (
-    <article className="space-y-10">
+    <article className="lesson-article space-y-10">
       <KeyStatement>
         文本先被 Tokenizer 切成 Token 并映射为 ID；模型用 ID 查 Embedding 矩阵得到向量，再结合位置与上下文形成 Hidden State。
       </KeyStatement>
@@ -323,7 +323,7 @@ B_used + B_reserved ≤ B_run</FormulaBlock>
               <p className="text-sm leading-6 text-muted-foreground">Q、K、V 是什么？模型怎样让不同 Token 彼此交换信息？</p>
             </div>
           </div>
-          <Badge variant="outline">内容整理中</Badge>
+          <Badge>已解锁</Badge>
         </CardContent>
       </Card>
 
@@ -332,8 +332,8 @@ B_used + B_reserved ≤ B_run</FormulaBlock>
           <ArrowLeft data-icon="inline-start" />
           返回 Lesson 01
         </Button>
-        <Button variant="secondary" size="lg" onClick={onRoadmap}>
-          查看完整学习路线
+        <Button size="lg" onClick={onNext}>
+          下一课：Transformer 与 Attention
           <ArrowRight data-icon="inline-end" />
         </Button>
       </div>
